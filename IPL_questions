@@ -1,0 +1,52 @@
+-- Q1 :Number of matches played per year.
+SELECT season, COUNT(*) as total_matches
+FROM matches
+GROUP BY season
+ORDER BY season;     
+
+-- Q2 :Number of matches won by each team across all IPL seasons.
+SELECT winner,count(winner) as matches_won
+FROM matches
+GROUP BY winner 
+HAVING winner IS NOT NULL
+ORDER BY 2 desc;
+
+-- Q3 : Extra runs conceded by each bowling team in 2016.
+SELECT bowling_team,SUM(extra_runs) 
+FROM matches m JOIN deliveries d 
+ON m.id=d.match_id
+WHERE m.season=2016 
+GROUP BY d.bowling_team
+ORDER BY 2 desc;
+
+-- Q4 : Top economical bowlers in 2015.
+SELECT d.bowler,
+ROUND(((SUM(d.wide_runs)+SUM(d.noball_runs)+SUM(d.batsman_runs))*6.0/
+count(case
+WHEN d.noball_runs=0 AND d.wide_runs=0
+THEN 1 
+END)),2) AS Economy
+FROM matches m JOIN deliveries d
+ON m.id=d.match_id 
+WHERE m.season=2015
+GROUP BY d.bowler
+HAVING COUNT(
+CASE
+WHEN d.noball_runs=0 AND d.wide_runs=0
+THEN 1
+END
+)>11
+ORDER BY 2
+LIMIT 5;
+
+-- Q5 : For the year 2016, top 5 batsmen 
+-- who scored the most runs across all matches.
+
+SELECT d.batsman,sum(d.batsman_runs) as batsman_runs
+FROM matches m JOIN deliveries d
+ON m.id=d.match_id 
+WHERE m.season=2016
+GROUP BY d.batsman
+ORDER BY batsman_runs desc 
+LIMIT 5;
+
